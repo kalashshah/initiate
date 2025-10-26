@@ -18,6 +18,13 @@ import {
   handleGetTransactionReceiptStatus,
   handleGetTransactionErrorStatus,
 } from "../app/api/execute/tools/blockscout-tools";
+import {
+  web3Tools,
+  handleSendNativeToken,
+  handleSendERC20Token,
+  handleGetGasPrice,
+  handleEstimateTransactionGas,
+} from "../app/api/execute/tools/web3-tools";
 
 // Types for transcription
 export interface TranscriptionRequest {
@@ -343,6 +350,18 @@ async function executeToolCall(toolName: string, args: Record<string, unknown>) 
       return await handleGetTransactionReceiptStatus(args as { txhash: string });
     case "get_transaction_error_status":
       return await handleGetTransactionErrorStatus(args as { txhash: string });
+    case "send_native_token":
+      return await handleSendNativeToken(args as { to: string; amount: string });
+    case "send_erc20_token":
+      return await handleSendERC20Token(args as {
+        contractAddress: string;
+        to: string;
+        amount: string;
+      });
+    case "get_gas_price":
+      return await handleGetGasPrice(args as Record<string, never>);
+    case "estimate_transaction_gas":
+      return await handleEstimateTransactionGas(args as { to: string; data?: string });
     default:
       throw new Error(`Unknown tool: ${toolName}`);
   }
@@ -369,8 +388,8 @@ export async function generateResponse(
       };
     }
 
-    // Use blockscout tools
-    const tools = [...blockscoutTools];
+    // Use blockscout tools and web3 tools
+    const tools = [...blockscoutTools, ...web3Tools];
 
     // Build messages array for API call - response is for watchOS so keep it concise and simple
     const messagesArray = [{role: "system", content: "You are a helpful blockchain assistant for Apple Watch. IMPORTANT: Keep responses SHORT (under 2 sentences) and SIMPLE - NO markdown formatting, NO code blocks, NO symbols. Just plain text. Default address is 0xC039654Bf76d6aF77A851c26167FBf07405C59BA"}, ...messages];

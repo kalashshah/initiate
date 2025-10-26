@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { blockscoutTools } from "./tools/blockscout-tools";
+import { web3Tools } from "./tools/web3-tools";
 import {
   handleGetNativeTokenBalance,
   handleGetTransactionsByAddress,
@@ -18,6 +19,12 @@ import {
   handleGetTransactionReceiptStatus,
   handleGetTransactionErrorStatus,
 } from "./tools/blockscout-tools";
+import {
+  handleSendNativeToken,
+  handleSendERC20Token,
+  handleGetGasPrice,
+  handleEstimateTransactionGas,
+} from "./tools/web3-tools";
 
 // Types for the execute API
 interface ExecuteRequest {
@@ -115,13 +122,25 @@ async function executeToolCall(toolName: string, args: Record<string, unknown>) 
       return await handleGetTransactionReceiptStatus(args as { txhash: string });
     case "get_transaction_error_status":
       return await handleGetTransactionErrorStatus(args as { txhash: string });
+    case "send_native_token":
+      return await handleSendNativeToken(args as { to: string; amount: string });
+    case "send_erc20_token":
+      return await handleSendERC20Token(args as {
+        contractAddress: string;
+        to: string;
+        amount: string;
+      });
+    case "get_gas_price":
+      return await handleGetGasPrice(args as Record<string, never>);
+    case "estimate_transaction_gas":
+      return await handleEstimateTransactionGas(args as { to: string; data?: string });
     default:
       throw new Error(`Unknown tool: ${toolName}`);
   }
 }
 
 // Static tools array
-const tools = [...blockscoutTools];
+const tools = [...blockscoutTools, ...web3Tools];
 
 export async function POST(request: NextRequest) {
   try {
