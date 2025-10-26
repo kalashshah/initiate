@@ -363,6 +363,61 @@ export const blockscoutTools = [
       },
     },
   },
+  {
+    type: "function" as const,
+    function: {
+      name: "get_transaction_info",
+      description: "Get detailed information about a transaction including gas, value, logs, revert reason, and more.",
+      parameters: {
+        type: "object",
+        properties: {
+          txhash: {
+            type: "string",
+            description: "The transaction hash to get info for",
+          },
+          index: {
+            type: "number",
+            description: "Log index for pagination",
+          },
+        },
+        required: ["txhash"],
+      },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "get_transaction_receipt_status",
+      description: "Get transaction receipt status (0 = failed, 1 = successful).",
+      parameters: {
+        type: "object",
+        properties: {
+          txhash: {
+            type: "string",
+            description: "The transaction hash to check status for",
+          },
+        },
+        required: ["txhash"],
+      },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "get_transaction_error_status",
+      description: "Get error status and description for a transaction.",
+      parameters: {
+        type: "object",
+        properties: {
+          txhash: {
+            type: "string",
+            description: "The transaction hash to check for errors",
+          },
+        },
+        required: ["txhash"],
+      },
+    },
+  },
 ];
 
 // Handler functions for each tool
@@ -617,6 +672,41 @@ export async function handleGetBridgedTokens(params: {
   if (params.chainid !== undefined) url.searchParams.append("chainid", params.chainid.toString());
   if (params.page !== undefined) url.searchParams.append("page", params.page.toString());
   if (params.offset !== undefined) url.searchParams.append("offset", params.offset.toString());
+
+  const response = await fetch(url.toString());
+  const data = await response.json();
+  return data;
+}
+
+export async function handleGetTransactionInfo(params: { txhash: string; index?: number }) {
+  const url = new URL(`${API_BASE_URL}`);
+  url.searchParams.append("module", "transaction");
+  url.searchParams.append("action", "gettxinfo");
+  url.searchParams.append("txhash", params.txhash);
+
+  if (params.index !== undefined) url.searchParams.append("index", params.index.toString());
+
+  const response = await fetch(url.toString());
+  const data = await response.json();
+  return data;
+}
+
+export async function handleGetTransactionReceiptStatus(params: { txhash: string }) {
+  const url = new URL(`${API_BASE_URL}`);
+  url.searchParams.append("module", "transaction");
+  url.searchParams.append("action", "gettxreceiptstatus");
+  url.searchParams.append("txhash", params.txhash);
+
+  const response = await fetch(url.toString());
+  const data = await response.json();
+  return data;
+}
+
+export async function handleGetTransactionErrorStatus(params: { txhash: string }) {
+  const url = new URL(`${API_BASE_URL}`);
+  url.searchParams.append("module", "transaction");
+  url.searchParams.append("action", "getstatus");
+  url.searchParams.append("txhash", params.txhash);
 
   const response = await fetch(url.toString());
   const data = await response.json();

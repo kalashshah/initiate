@@ -14,6 +14,9 @@ import {
   handleGetTokenInfo,
   handleGetTokenHolders,
   handleGetBridgedTokens,
+  handleGetTransactionInfo,
+  handleGetTransactionReceiptStatus,
+  handleGetTransactionErrorStatus,
 } from "./tools/blockscout-tools";
 
 // Types for the execute API
@@ -106,6 +109,12 @@ async function executeToolCall(toolName: string, args: Record<string, unknown>) 
         page?: number;
         offset?: number;
       });
+    case "get_transaction_info":
+      return await handleGetTransactionInfo(args as { txhash: string; index?: number });
+    case "get_transaction_receipt_status":
+      return await handleGetTransactionReceiptStatus(args as { txhash: string });
+    case "get_transaction_error_status":
+      return await handleGetTransactionErrorStatus(args as { txhash: string });
     default:
       throw new Error(`Unknown tool: ${toolName}`);
   }
