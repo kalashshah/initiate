@@ -11,6 +11,9 @@ import {
   handleGetContractABI,
   handleGetContractSourceCode,
   handleGetContractCreation,
+  handleGetTokenInfo,
+  handleGetTokenHolders,
+  handleGetBridgedTokens,
 } from "../app/api/execute/tools/blockscout-tools";
 
 // Types for transcription
@@ -317,6 +320,20 @@ async function executeToolCall(toolName: string, args: Record<string, unknown>) 
       return await handleGetContractSourceCode(args as { address: string });
     case "get_contract_creation":
       return await handleGetContractCreation(args as { contractaddresses: string });
+    case "get_token_info":
+      return await handleGetTokenInfo(args as { contractaddress: string });
+    case "get_token_holders":
+      return await handleGetTokenHolders(args as {
+        contractaddress: string;
+        page?: number;
+        offset?: number;
+      });
+    case "get_bridged_tokens":
+      return await handleGetBridgedTokens(args as {
+        chainid?: number;
+        page?: number;
+        offset?: number;
+      });
     default:
       throw new Error(`Unknown tool: ${toolName}`);
   }

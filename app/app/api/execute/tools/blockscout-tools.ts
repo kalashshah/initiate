@@ -296,6 +296,73 @@ export const blockscoutTools = [
       },
     },
   },
+  {
+    type: "function" as const,
+    function: {
+      name: "get_token_info",
+      description: "Get name, symbol, supply, decimals, and type (ERC-20/ERC-721) for a token contract address.",
+      parameters: {
+        type: "object",
+        properties: {
+          contractaddress: {
+            type: "string",
+            description: "The token contract address to get info for",
+          },
+        },
+        required: ["contractaddress"],
+      },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "get_token_holders",
+      description: "Get list of token holders and their balances for a specific token contract address.",
+      parameters: {
+        type: "object",
+        properties: {
+          contractaddress: {
+            type: "string",
+            description: "The token contract address to get holders for",
+          },
+          page: {
+            type: "number",
+            description: "Page number for pagination",
+          },
+          offset: {
+            type: "number",
+            description: "Number of holders per page",
+          },
+        },
+        required: ["contractaddress"],
+      },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "get_bridged_tokens",
+      description: "Get list of bridged tokens (only available on chains with native bridge).",
+      parameters: {
+        type: "object",
+        properties: {
+          chainid: {
+            type: "number",
+            description: "Chain ID where the original token exists",
+          },
+          page: {
+            type: "number",
+            description: "Page number for pagination",
+          },
+          offset: {
+            type: "number",
+            description: "Number of tokens per page",
+          },
+        },
+        required: [],
+      },
+    },
+  },
 ];
 
 // Handler functions for each tool
@@ -503,6 +570,53 @@ export async function handleGetContractCreation(params: { contractaddresses: str
   url.searchParams.append("module", "contract");
   url.searchParams.append("action", "getcontractcreation");
   url.searchParams.append("contractaddresses", params.contractaddresses);
+
+  const response = await fetch(url.toString());
+  const data = await response.json();
+  return data;
+}
+
+export async function handleGetTokenInfo(params: { contractaddress: string }) {
+  const url = new URL(`${API_BASE_URL}`);
+  url.searchParams.append("module", "token");
+  url.searchParams.append("action", "getToken");
+  url.searchParams.append("contractaddress", params.contractaddress);
+
+  const response = await fetch(url.toString());
+  const data = await response.json();
+  return data;
+}
+
+export async function handleGetTokenHolders(params: {
+  contractaddress: string;
+  page?: number;
+  offset?: number;
+}) {
+  const url = new URL(`${API_BASE_URL}`);
+  url.searchParams.append("module", "token");
+  url.searchParams.append("action", "getTokenHolders");
+  url.searchParams.append("contractaddress", params.contractaddress);
+
+  if (params.page !== undefined) url.searchParams.append("page", params.page.toString());
+  if (params.offset !== undefined) url.searchParams.append("offset", params.offset.toString());
+
+  const response = await fetch(url.toString());
+  const data = await response.json();
+  return data;
+}
+
+export async function handleGetBridgedTokens(params: {
+  chainid?: number;
+  page?: number;
+  offset?: number;
+}) {
+  const url = new URL(`${API_BASE_URL}`);
+  url.searchParams.append("module", "token");
+  url.searchParams.append("action", "bridgedTokenList");
+
+  if (params.chainid !== undefined) url.searchParams.append("chainid", params.chainid.toString());
+  if (params.page !== undefined) url.searchParams.append("page", params.page.toString());
+  if (params.offset !== undefined) url.searchParams.append("offset", params.offset.toString());
 
   const response = await fetch(url.toString());
   const data = await response.json();
