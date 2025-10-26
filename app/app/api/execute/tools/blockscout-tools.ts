@@ -245,6 +245,57 @@ export const blockscoutTools = [
       },
     },
   },
+  {
+    type: "function" as const,
+    function: {
+      name: "get_contract_abi",
+      description: "Get the ABI for a verified smart contract address.",
+      parameters: {
+        type: "object",
+        properties: {
+          address: {
+            type: "string",
+            description: "The contract address to get the ABI for",
+          },
+        },
+        required: ["address"],
+      },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "get_contract_source_code",
+      description: "Get the source code for a verified smart contract address.",
+      parameters: {
+        type: "object",
+        properties: {
+          address: {
+            type: "string",
+            description: "The contract address to get the source code for",
+          },
+        },
+        required: ["address"],
+      },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "get_contract_creation",
+      description: "Get the creator address and transaction hash for one or more contract addresses (up to 10).",
+      parameters: {
+        type: "object",
+        properties: {
+          contractaddresses: {
+            type: "string",
+            description: "Comma-separated list of contract addresses (max 10)",
+          },
+        },
+        required: ["contractaddresses"],
+      },
+    },
+  },
 ];
 
 // Handler functions for each tool
@@ -419,6 +470,39 @@ export async function handleGetInternalTransactions(params: {
   if (params.endblock !== undefined) url.searchParams.append("endblock", params.endblock.toString());
   if (params.page !== undefined) url.searchParams.append("page", params.page.toString());
   if (params.offset !== undefined) url.searchParams.append("offset", params.offset.toString());
+
+  const response = await fetch(url.toString());
+  const data = await response.json();
+  return data;
+}
+
+export async function handleGetContractABI(params: { address: string }) {
+  const url = new URL(`${API_BASE_URL}`);
+  url.searchParams.append("module", "contract");
+  url.searchParams.append("action", "getabi");
+  url.searchParams.append("address", params.address);
+
+  const response = await fetch(url.toString());
+  const data = await response.json();
+  return data;
+}
+
+export async function handleGetContractSourceCode(params: { address: string }) {
+  const url = new URL(`${API_BASE_URL}`);
+  url.searchParams.append("module", "contract");
+  url.searchParams.append("action", "getsourcecode");
+  url.searchParams.append("address", params.address);
+
+  const response = await fetch(url.toString());
+  const data = await response.json();
+  return data;
+}
+
+export async function handleGetContractCreation(params: { contractaddresses: string }) {
+  const url = new URL(`${API_BASE_URL}`);
+  url.searchParams.append("module", "contract");
+  url.searchParams.append("action", "getcontractcreation");
+  url.searchParams.append("contractaddresses", params.contractaddresses);
 
   const response = await fetch(url.toString());
   const data = await response.json();

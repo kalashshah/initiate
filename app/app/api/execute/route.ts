@@ -8,6 +8,9 @@ import {
   handleGetERC721TokenTransfers,
   handleGetERC1155TokenTransfers,
   handleGetInternalTransactions,
+  handleGetContractABI,
+  handleGetContractSourceCode,
+  handleGetContractCreation,
 } from "./tools/blockscout-tools";
 
 // Types for the execute API
@@ -80,6 +83,12 @@ async function executeToolCall(toolName: string, args: Record<string, unknown>) 
         page?: number;
         offset?: number;
       });
+    case "get_contract_abi":
+      return await handleGetContractABI(args as { address: string });
+    case "get_contract_source_code":
+      return await handleGetContractSourceCode(args as { address: string });
+    case "get_contract_creation":
+      return await handleGetContractCreation(args as { contractaddresses: string });
     default:
       throw new Error(`Unknown tool: ${toolName}`);
   }
