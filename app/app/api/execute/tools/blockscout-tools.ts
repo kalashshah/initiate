@@ -119,6 +119,132 @@ export const blockscoutTools = [
       },
     },
   },
+  {
+    type: "function" as const,
+    function: {
+      name: "get_erc721_token_transfers",
+      description: "Get ERC-721 (NFT) token transfer events by address or contract.",
+      parameters: {
+        type: "object",
+        properties: {
+          address: {
+            type: "string",
+            description: "Address to get ERC-721 transfers for",
+          },
+          contractaddress: {
+            type: "string",
+            description: "Token contract address to filter by",
+          },
+          sort: {
+            type: "string",
+            enum: ["asc", "desc"],
+            description: "Sort order: 'asc' for ascending, 'desc' for descending",
+          },
+          startblock: {
+            type: "number",
+            description: "Starting block number to search from",
+          },
+          endblock: {
+            type: "number",
+            description: "Ending block number to search to",
+          },
+          page: {
+            type: "number",
+            description: "Page number for pagination",
+          },
+          offset: {
+            type: "number",
+            description: "Number of transactions per page",
+          },
+        },
+        required: [],
+      },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "get_erc1155_token_transfers",
+      description: "Get ERC-1155 token transfer events by address or contract.",
+      parameters: {
+        type: "object",
+        properties: {
+          address: {
+            type: "string",
+            description: "Address to get ERC-1155 transfers for",
+          },
+          contractaddress: {
+            type: "string",
+            description: "Token contract address to filter by",
+          },
+          sort: {
+            type: "string",
+            enum: ["asc", "desc"],
+            description: "Sort order: 'asc' for ascending, 'desc' for descending",
+          },
+          startblock: {
+            type: "number",
+            description: "Starting block number to search from",
+          },
+          endblock: {
+            type: "number",
+            description: "Ending block number to search to",
+          },
+          page: {
+            type: "number",
+            description: "Page number for pagination",
+          },
+          offset: {
+            type: "number",
+            description: "Number of transactions per page",
+          },
+        },
+        required: [],
+      },
+    },
+  },
+  {
+    type: "function" as const,
+    function: {
+      name: "get_internal_transactions",
+      description: "Get internal transactions by transaction hash or address (up to 10,000).",
+      parameters: {
+        type: "object",
+        properties: {
+          txhash: {
+            type: "string",
+            description: "Transaction hash to check for internal transactions",
+          },
+          address: {
+            type: "string",
+            description: "Address to get internal transactions for",
+          },
+          sort: {
+            type: "string",
+            enum: ["asc", "desc"],
+            description: "Sort order: 'asc' for ascending, 'desc' for descending",
+          },
+          startblock: {
+            type: "number",
+            description: "Starting block number to search from",
+          },
+          endblock: {
+            type: "number",
+            description: "Ending block number to search to",
+          },
+          page: {
+            type: "number",
+            description: "Page number for pagination",
+          },
+          offset: {
+            type: "number",
+            description: "Number of transactions per page",
+          },
+        },
+        required: [],
+      },
+    },
+  },
 ];
 
 // Handler functions for each tool
@@ -218,6 +344,84 @@ export async function handleGetTokenList(params: { address: string }) {
     };
   }
   
+  return data;
+}
+
+export async function handleGetERC721TokenTransfers(params: {
+  address?: string;
+  contractaddress?: string;
+  sort?: string;
+  startblock?: number;
+  endblock?: number;
+  page?: number;
+  offset?: number;
+}) {
+  const url = new URL(`${API_BASE_URL}`);
+  url.searchParams.append("module", "account");
+  url.searchParams.append("action", "tokennfttx");
+
+  if (params.address) url.searchParams.append("address", params.address);
+  if (params.contractaddress) url.searchParams.append("contractaddress", params.contractaddress);
+  if (params.sort) url.searchParams.append("sort", params.sort);
+  if (params.startblock !== undefined) url.searchParams.append("startblock", params.startblock.toString());
+  if (params.endblock !== undefined) url.searchParams.append("endblock", params.endblock.toString());
+  if (params.page !== undefined) url.searchParams.append("page", params.page.toString());
+  if (params.offset !== undefined) url.searchParams.append("offset", params.offset.toString());
+
+  const response = await fetch(url.toString());
+  const data = await response.json();
+  return data;
+}
+
+export async function handleGetERC1155TokenTransfers(params: {
+  address?: string;
+  contractaddress?: string;
+  sort?: string;
+  startblock?: number;
+  endblock?: number;
+  page?: number;
+  offset?: number;
+}) {
+  const url = new URL(`${API_BASE_URL}`);
+  url.searchParams.append("module", "account");
+  url.searchParams.append("action", "token1155tx");
+
+  if (params.address) url.searchParams.append("address", params.address);
+  if (params.contractaddress) url.searchParams.append("contractaddress", params.contractaddress);
+  if (params.sort) url.searchParams.append("sort", params.sort);
+  if (params.startblock !== undefined) url.searchParams.append("startblock", params.startblock.toString());
+  if (params.endblock !== undefined) url.searchParams.append("endblock", params.endblock.toString());
+  if (params.page !== undefined) url.searchParams.append("page", params.page.toString());
+  if (params.offset !== undefined) url.searchParams.append("offset", params.offset.toString());
+
+  const response = await fetch(url.toString());
+  const data = await response.json();
+  return data;
+}
+
+export async function handleGetInternalTransactions(params: {
+  txhash?: string;
+  address?: string;
+  sort?: string;
+  startblock?: number;
+  endblock?: number;
+  page?: number;
+  offset?: number;
+}) {
+  const url = new URL(`${API_BASE_URL}`);
+  url.searchParams.append("module", "account");
+  url.searchParams.append("action", "txlistinternal");
+
+  if (params.txhash) url.searchParams.append("txhash", params.txhash);
+  if (params.address) url.searchParams.append("address", params.address);
+  if (params.sort) url.searchParams.append("sort", params.sort);
+  if (params.startblock !== undefined) url.searchParams.append("startblock", params.startblock.toString());
+  if (params.endblock !== undefined) url.searchParams.append("endblock", params.endblock.toString());
+  if (params.page !== undefined) url.searchParams.append("page", params.page.toString());
+  if (params.offset !== undefined) url.searchParams.append("offset", params.offset.toString());
+
+  const response = await fetch(url.toString());
+  const data = await response.json();
   return data;
 }
 

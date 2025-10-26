@@ -5,6 +5,9 @@ import {
   handleGetTransactionsByAddress,
   handleGetERC20TokenTransfers,
   handleGetTokenList,
+  handleGetERC721TokenTransfers,
+  handleGetERC1155TokenTransfers,
+  handleGetInternalTransactions,
 } from "../app/api/execute/tools/blockscout-tools";
 
 // Types for transcription
@@ -275,6 +278,36 @@ async function executeToolCall(toolName: string, args: Record<string, unknown>) 
       });
     case "get_token_list":
       return await handleGetTokenList(args as { address: string });
+    case "get_erc721_token_transfers":
+      return await handleGetERC721TokenTransfers(args as {
+        address?: string;
+        contractaddress?: string;
+        sort?: string;
+        startblock?: number;
+        endblock?: number;
+        page?: number;
+        offset?: number;
+      });
+    case "get_erc1155_token_transfers":
+      return await handleGetERC1155TokenTransfers(args as {
+        address?: string;
+        contractaddress?: string;
+        sort?: string;
+        startblock?: number;
+        endblock?: number;
+        page?: number;
+        offset?: number;
+      });
+    case "get_internal_transactions":
+      return await handleGetInternalTransactions(args as {
+        txhash?: string;
+        address?: string;
+        sort?: string;
+        startblock?: number;
+        endblock?: number;
+        page?: number;
+        offset?: number;
+      });
     default:
       throw new Error(`Unknown tool: ${toolName}`);
   }
